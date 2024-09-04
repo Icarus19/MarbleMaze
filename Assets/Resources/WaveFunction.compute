@@ -1,0 +1,64 @@
+#pragma kernel SinWave
+#pragma kernel Gradient
+#pragma kernel GradientWave
+#pragma kernel CalculateInitialSpectrum
+
+#include "Simplex.compute"
+
+RWTexture2D<float4> _Texture; //This is 1024x1024
+float _Freq,
+      _Amp,
+      _Angle,
+      _Time,
+      _SpectrumPeak,
+      _DirectionDis,
+      _LowPassFilter;
+uniform float PI = 3.14159265359;
+
+float Sea_Octave(float3 uv, float choppy)
+{
+    uv += snoise(uv);
+    float3 wv = 1.0 - abs(sin(uv));
+    float3 swv = abs(cos(uv));
+    wv = lerp(wv, swv, wv);
+
+    return pow(abs(1.0 - pow(wv.x * wv.y, 0.65)), choppy);
+}
+float waveGenerator(float x, float freq, float speed, float direction, float phase)
+{
+    
+    float wave = amplitude * sin(frequency * x + phase * _Time + shift)
+    return wave;
+}
+
+
+[numthreads(8,8,1)]
+void SinWave (uint3 id : SV_DispatchThreadID)
+{
+    _Texture[id.xy] = _Amp * sin(id.x / 1024.0 + _Time * _Freq);
+}
+
+[numthreads(8,8,1)]
+void Gradient(uint3 id : SV_DISPATCHTHREADID)
+{
+    float x = id.x / 1024.0;
+    float y = id.y / 1024.0;
+
+    float gradient = lerp(x, y, _Time * _Amp);
+    _Texture[id.xy] = id.x / 1024.0 * _Amp;
+}
+
+[numthreads(8,8,1)]
+void GradientWave(uint3 id : SV_DISPATCHTHREADID)
+{
+    float p = 0.0;
+    float k = 2.0 * 3.14159265359 * _Freq;
+    float speed = 2.0;
+    float f = ((id.x / 1024.0) + _Time * speed);
+    p += _Amp * cos(k * f);
+    p += _Amp * sin(k * f);
+    p += _Amp * cos((k + 2) * f);
+    p += _Amp * sin((k + 2) * f);
+
+    _Texture[id.xy] = p;
+}
