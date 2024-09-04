@@ -129,8 +129,8 @@ public class WavesCascade
         turbulence.GenerateMips();
     }
 
-    const int LOCAL_WORK_GROUPS_X = 8;
-    const int LOCAL_WORK_GROUPS_Y = 8;
+    const int LOCAL_WORK_GROUPS_X = 4;
+    const int LOCAL_WORK_GROUPS_Y = 4;
 
     // Kernel IDs:
     int KERNEL_INITIAL_SPECTRUM;

@@ -92,7 +92,7 @@ public class WaveManager : MonoBehaviour
         cascades[1].CalculateWavesAtTime(Time.time);
         cascades[2].CalculateWavesAtTime(Time.time);
 
-        /*initialSpectrum = cascades[cascadeID].InitialSpectrum;
+        initialSpectrum = cascades[cascadeID].InitialSpectrum;
         precomputedData = cascades[cascadeID].PrecomputedData;
         buffer = cascades[cascadeID].buffer;
         DxDz = cascades[cascadeID].DxDz;
@@ -101,7 +101,7 @@ public class WaveManager : MonoBehaviour
         DxxDzz = cascades[cascadeID].DxxDzz;
         displacement = cascades[cascadeID].displacement;
         derivatives = cascades[cascadeID].derivatives;
-        turbulence = cascades[cascadeID].turbulence;*/
+        turbulence = cascades[cascadeID].turbulence;
 
         material.SetTexture("_Displacement_c0", cascades[0].Displacement);
         material.SetTexture("_Derivatives_c0", cascades[0].Derivatives);

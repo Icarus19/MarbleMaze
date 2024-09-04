@@ -10,8 +10,8 @@ static const float PI = 3.1415926;
 
 RWTexture2D<float4> PrecomputeBuffer;
 Texture2D<float4> PrecomputedData;
-RWTexture2D<float2> Buffer0;
-RWTexture2D<float2> Buffer1;
+RWTexture2D<float4> Buffer0;
+RWTexture2D<float4> Buffer1;
 bool PingPong;
 uint Step;
 uint Size;
@@ -26,7 +26,7 @@ float2 ComplexExp(float2 a)
 	return float2(cos(a.y), sin(a.y)) * exp(a.x);
 }
 
-[numthreads(1, 8, 1)]
+[numthreads(1, 4, 1)]
 void PrecomputeTwiddleFactorsAndInputIndices(uint3 id : SV_DispatchThreadID)
 {
 	uint b = Size >> (id.x + 1);
@@ -37,81 +37,81 @@ void PrecomputeTwiddleFactorsAndInputIndices(uint3 id : SV_DispatchThreadID)
 	PrecomputeBuffer[uint2(id.x, id.y + Size / 2)] = float4(-twiddle.x, -twiddle.y, i, i + b);
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(4, 4, 1)]
 void HorizontalStepFFT (uint3 id : SV_DispatchThreadID)
 {
 	float4 data = PrecomputedData[uint2(Step, id.x)];
 	uint2 inputsIndices = (uint2)data.ba;
 	if (PingPong)
 	{
-		Buffer1[id.xy] = Buffer0[uint2(inputsIndices.x, id.y)]
-			+ ComplexMult(data.rg, Buffer0[uint2(inputsIndices.y, id.y)]);
+		Buffer1[id.xy] = float4(Buffer0[uint2(inputsIndices.x, id.y)]
+			+ ComplexMult(data.rg, Buffer0[uint2(inputsIndices.y, id.y)]), 0.0, 0.0);
 	}
 	else
 	{
-		Buffer0[id.xy] = Buffer1[uint2(inputsIndices.x, id.y)]
-			+ ComplexMult(data.rg, Buffer1[uint2(inputsIndices.y, id.y)]);
+		Buffer0[id.xy] = float4(Buffer1[uint2(inputsIndices.x, id.y)]
+			+ ComplexMult(data.rg, Buffer1[uint2(inputsIndices.y, id.y)]), 0.0, 0.0);
 	}
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(4, 4, 1)]
 void VerticalStepFFT(uint3 id : SV_DispatchThreadID)
 {
 	float4 data = PrecomputedData[uint2(Step, id.y)];
 	uint2 inputsIndices = (uint2)data.ba;
 	if (PingPong)
 	{
-		Buffer1[id.xy] = Buffer0[uint2(id.x, inputsIndices.x)]
-			+ ComplexMult(data.rg, Buffer0[uint2(id.x, inputsIndices.y)]);
+		Buffer1[id.xy] = float4(Buffer0[uint2(id.x, inputsIndices.x)]
+			+ ComplexMult(data.rg, Buffer0[uint2(id.x, inputsIndices.y)]), 0.0, 0.0);
 	}
 	else
 	{
-		Buffer0[id.xy] = Buffer1[uint2(id.x, inputsIndices.x)]
-			+ ComplexMult(data.rg, Buffer1[uint2(id.x, inputsIndices.y)]);
+		Buffer0[id.xy] = float4(Buffer1[uint2(id.x, inputsIndices.x)]
+			+ ComplexMult(data.rg, Buffer1[uint2(id.x, inputsIndices.y)]), 0.0, 0.0);
 	}
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(4, 4, 1)]
 void HorizontalStepInverseFFT(uint3 id : SV_DispatchThreadID)
 {
 	float4 data = PrecomputedData[uint2(Step, id.x)];
 	uint2 inputsIndices = (uint2)data.ba;
 	if (PingPong)
 	{
-		Buffer1[id.xy] = Buffer0[uint2(inputsIndices.x, id.y)]
-			+ ComplexMult(float2(data.r, -data.g), Buffer0[uint2(inputsIndices.y, id.y)]);
+		Buffer1[id.xy] = float4(Buffer0[uint2(inputsIndices.x, id.y)]
+			+ ComplexMult(float2(data.r, -data.g), Buffer0[uint2(inputsIndices.y, id.y)]), 0.0, 0.0);
 	}
 	else
 	{
-		Buffer0[id.xy] = Buffer1[uint2(inputsIndices.x, id.y)]
-			+ ComplexMult(float2(data.r, -data.g), Buffer1[uint2(inputsIndices.y, id.y)]);
+		Buffer0[id.xy] = float4(Buffer1[uint2(inputsIndices.x, id.y)]
+			+ ComplexMult(float2(data.r, -data.g), Buffer1[uint2(inputsIndices.y, id.y)]), 0.0, 0.0);
 	}
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(4, 4, 1)]
 void VerticalStepInverseFFT(uint3 id : SV_DispatchThreadID)
 {
 	float4 data = PrecomputedData[uint2(Step, id.y)];
 	uint2 inputsIndices = (uint2)data.ba;
 	if (PingPong)
 	{
-		Buffer1[id.xy] = Buffer0[uint2(id.x, inputsIndices.x)]
-			+ ComplexMult(float2(data.r, -data.g), Buffer0[uint2(id.x, inputsIndices.y)]);
+		Buffer1[id.xy] = float4(Buffer0[uint2(id.x, inputsIndices.x)]
+			+ ComplexMult(float2(data.r, -data.g), Buffer0[uint2(id.x, inputsIndices.y)]), 0.0, 0.0);
 	}
 	else
 	{
-		Buffer0[id.xy] = Buffer1[uint2(id.x, inputsIndices.x)]
-			+ ComplexMult(float2(data.r, -data.g), Buffer1[uint2(id.x, inputsIndices.y)]);
+		Buffer0[id.xy] = float4(Buffer1[uint2(id.x, inputsIndices.x)]
+			+ ComplexMult(float2(data.r, -data.g), Buffer1[uint2(id.x, inputsIndices.y)]), 0.0, 0.0);
 	}
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(4, 4, 1)]
 void Scale(uint3 id : SV_DispatchThreadID)
 {
 	Buffer0[id.xy] = Buffer0[id.xy] / Size / Size;
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(4, 4, 1)]
 void Permute(uint3 id : SV_DispatchThreadID)
 {
 	Buffer0[id.xy] = Buffer0[id.xy] * (1.0 - 2.0 * ((id.x + id.y) % 2));

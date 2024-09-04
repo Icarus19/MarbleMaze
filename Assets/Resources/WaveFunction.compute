@@ -24,10 +24,10 @@ float Sea_Octave(float3 uv, float choppy)
 
     return pow(abs(1.0 - pow(wv.x * wv.y, 0.65)), choppy);
 }
-float waveGenerator(float x, float freq, float speed, float direction, float phase)
+float waveGenerator(float x, float freq, float speed, float shift, float phase)
 {
     
-    float wave = amplitude * sin(frequency * x + phase * _Time + shift)
+    float wave = _Amp * sin(freq * x + phase * _Time + shift);
     return wave;
 }
 

@@ -6,7 +6,7 @@ static const float PI = 3.1415926;
 RWTexture2D<float4> H0;
 // wave vector x, 1 / magnitude, wave vector z, frequency
 RWTexture2D<float4> WavesData;
-RWTexture2D<float2> H0K;
+RWTexture2D<float4> H0K;
 
 Texture2D<float2> Noise;
 uint Size;
@@ -128,7 +128,7 @@ float ShortWavesFade(float kLength, SpectrumParameters pars)
 	return exp(-pars.shortWavesFade * pars.shortWavesFade * kLength * kLength);
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(4, 4, 1)]
 void CalculateInitialSpectrum(uint3 id : SV_DispatchThreadID)
 {
 	float deltaK = 2 * PI / LengthScale;
@@ -149,7 +149,7 @@ void CalculateInitialSpectrum(uint3 id : SV_DispatchThreadID)
 		if (Spectrums[1].scale > 0)
 			spectrum += JONSWAP(omega, GravityAcceleration, Depth, Spectrums[1])
 			* DirectionSpectrum(kAngle, omega, Spectrums[1]) * ShortWavesFade(kLength, Spectrums[1]);
-		H0K[id.xy] = float2(Noise[id.xy].x, Noise[id.xy].y)
+		H0K[id.xy] = float4(Noise[id.xy].x, Noise[id.xy].y, 0.0, 0.0)
 			* sqrt(2 * spectrum * abs(dOmegadk) / kLength * deltaK * deltaK);
 	}
 	else
@@ -159,10 +159,10 @@ void CalculateInitialSpectrum(uint3 id : SV_DispatchThreadID)
 	}
 }
 
-[numthreads(8,8,1)]
+[numthreads(4,4,1)]
 void CalculateConjugatedSpectrum(uint3 id : SV_DispatchThreadID)
 {
-	float2 h0K = H0K[id.xy];
-	float2 h0MinusK = H0K[uint2((Size - id.x) % Size, (Size - id.y) % Size)];
+	float4 h0K = H0K[id.xy];
+	float4 h0MinusK = H0K[uint2((Size - id.x) % Size, (Size - id.y) % Size)];
 	H0[id.xy] = float4(h0K.x, h0K.y, h0MinusK.x, -h0MinusK.y);
 }

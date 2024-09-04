@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class FastFourierTransform
 {
-    const int LOCAL_WORK_GROUPS_X = 8;
-    const int LOCAL_WORK_GROUPS_Y = 8;
+    const int LOCAL_WORK_GROUPS_X = 4;
+    const int LOCAL_WORK_GROUPS_Y = 4;
 
     readonly int size;
     readonly ComputeShader fftShader;
@@ -13,6 +13,7 @@ public class FastFourierTransform
     {
         RenderTexture rt = new RenderTexture(size, size, 0,
             format, RenderTextureReadWrite.Linear);
+        rt.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm;
         rt.useMipMap = useMips;
         rt.autoGenerateMips = false;
         rt.anisoLevel = 6;
@@ -133,6 +134,7 @@ public class FastFourierTransform
         int logSize = (int)Mathf.Log(size, 2);
         RenderTexture rt = new RenderTexture(logSize, size, 0,
             RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+        rt.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R16_UNorm;
         rt.filterMode = FilterMode.Point;
         rt.wrapMode = TextureWrapMode.Repeat;
         rt.enableRandomWrite = true;
