@@ -81,6 +81,9 @@ public class FastFourierTransform
         int logSize = (int)Mathf.Log(size, 2);
         bool pingPong = false;
 
+        if (input == null || buffer == null)
+            Debug.Log("Missing textures");
+
         fftShader.SetTexture(KERNEL_HORIZONTAL_STEP_IFFT, PROP_ID_PRECOMPUTED_DATA, precomputedData);
         fftShader.SetTexture(KERNEL_HORIZONTAL_STEP_IFFT, PROP_ID_BUFFER0, input);
         fftShader.SetTexture(KERNEL_HORIZONTAL_STEP_IFFT, PROP_ID_BUFFER1, buffer);

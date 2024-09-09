@@ -1,0 +1,15 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture2D<float2> _Gaussian;
+RWTexture2D<float4> Result;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    float4 col = (1.0 - id.rgb, 1.0);
+    Result[id.xy] = 1.0 - float4(_Gaussian[id.xy].x, _Gaussian[id.xy].y, 0.0, 0.0);
+}

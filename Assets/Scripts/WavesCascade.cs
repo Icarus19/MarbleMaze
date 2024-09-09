@@ -61,11 +61,11 @@ public class WavesCascade
         turbulence = FastFourierTransform.CreateRenderTexture(size, RenderTextureFormat.ARGBFloat, true);
         paramsBuffer = new ComputeBuffer(2, 8 * sizeof(float));
 
-        buffer = FastFourierTransform.CreateRenderTexture(size);
-        DxDz = FastFourierTransform.CreateRenderTexture(size);
-        DyDxz = FastFourierTransform.CreateRenderTexture(size);
-        DyxDyz = FastFourierTransform.CreateRenderTexture(size);
-        DxxDzz = FastFourierTransform.CreateRenderTexture(size);
+        buffer = FastFourierTransform.CreateRenderTexture(size, RenderTextureFormat.ARGBFloat);
+        DxDz = FastFourierTransform.CreateRenderTexture(size, RenderTextureFormat.ARGBFloat);
+        DyDxz = FastFourierTransform.CreateRenderTexture(size, RenderTextureFormat.ARGBFloat);
+        DyxDyz = FastFourierTransform.CreateRenderTexture(size, RenderTextureFormat.ARGBFloat);
+        DxxDzz = FastFourierTransform.CreateRenderTexture(size, RenderTextureFormat.ARGBFloat);
     }
 
     public void Dispose()

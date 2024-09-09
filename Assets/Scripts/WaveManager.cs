@@ -69,13 +69,21 @@ public class WaveManager : MonoBehaviour
     public RenderTexture turbulence;
     void OnEnable()
     {
+        //In case the phone doesn't support the app lets not run it
+        if (!SystemInfo.supportsComputeShaders)
+        {
+            Debug.LogError("Doesn't Support ComputeShaders");
+            return;
+        }
+        if (!SystemInfo.supportsAsyncGPUReadback)
+        {
+            Debug.LogError("Doesn't support GPUReadback");
+            return;
+        }
+
         Application.targetFrameRate = 30;
 
         fft = new FastFourierTransform(256, fftShader);
-        /*waveFunctions = Resources.Load<ComputeShader>("WaveFunction");
-        waveTexture = new RenderTexture(1024, 1024, 0, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-        waveTexture.enableRandomWrite = true;
-        waveTexture.Create();*/
 
         gaussianNoise = GaussianNoise.GenerateGaussianNoise(textureResolution, mean, stdDev);
 
@@ -87,12 +95,30 @@ public class WaveManager : MonoBehaviour
     }
     void Update()
     {
+        Debug.Log(SystemInfo.graphicsDeviceType);
+        Debug.Log(SystemInfo.graphicsDeviceVersion);
+        //In case the phone doesn't support the app lets not run it
+        if (!SystemInfo.supportsComputeShaders)
+        {
+            Debug.LogError("Doesn't Support ComputeShaders");
+            return;
+        }
+        if (!SystemInfo.supportsAsyncGPUReadback)
+        {
+            Debug.LogError("Doesn't support GPUReadback");
+            return;
+        }
+        if(!SystemInfo.SupportsRandomWriteOnRenderTextureFormat(RenderTextureFormat.ARGBFloat))
+        {
+            Debug.LogError("Doesn't support RWTextures");
+            return;
+        }
 
         cascades[0].CalculateWavesAtTime(Time.time);
         cascades[1].CalculateWavesAtTime(Time.time);
         cascades[2].CalculateWavesAtTime(Time.time);
 
-        /*initialSpectrum = cascades[cascadeID].InitialSpectrum;
+        initialSpectrum = cascades[cascadeID].InitialSpectrum;
         precomputedData = cascades[cascadeID].PrecomputedData;
         buffer = cascades[cascadeID].buffer;
         DxDz = cascades[cascadeID].DxDz;
@@ -101,7 +127,7 @@ public class WaveManager : MonoBehaviour
         DxxDzz = cascades[cascadeID].DxxDzz;
         displacement = cascades[cascadeID].displacement;
         derivatives = cascades[cascadeID].derivatives;
-        turbulence = cascades[cascadeID].turbulence;*/
+        turbulence = cascades[cascadeID].turbulence;
 
         material.SetTexture("_Displacement_c0", cascades[0].Displacement);
         material.SetTexture("_Derivatives_c0", cascades[0].Derivatives);
@@ -128,12 +154,6 @@ public class WaveManager : MonoBehaviour
         Shader.SetGlobalFloat("LengthScale1", lengthScale1);
         Shader.SetGlobalFloat("LengthScale2", lengthScale2);
     }
-
-    /*void OnDisable()
-    {
-        waveTexture.Release();
-        waveTexture = null;
-    }*/
 
     void OnDestroy()
     {

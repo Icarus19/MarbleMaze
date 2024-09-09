@@ -2,7 +2,6 @@ Shader "Custom/WaterShader"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
     }
     SubShader
     {
